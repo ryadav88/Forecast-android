@@ -14,6 +14,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,12 +101,40 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
+        private String[] getWeatherDataFromJson(String forecastJsonStr)
+                throws JSONException {
+
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONObject ss = forecastJson.getJSONObject("forecast").getJSONObject("simpleforecast");
+            JSONArray weatherArray = ss.getJSONArray("forecastday");
+
+            String[] resultStrs = new String[10];
+
+            for(int i = 0; i < weatherArray.length(); i++) {
+                JSONObject dayForecast = weatherArray.getJSONObject(i);
+                JSONObject dateObject = dayForecast.getJSONObject("date");
+                String conditionsObject = dayForecast.getString("conditions");
+                JSONObject highObject = dayForecast.getJSONObject("high");
+                JSONObject lowObject = dayForecast.getJSONObject("low");
+
+                String monthDay = dateObject.getString("month") + "/" + dateObject.getString("day");
+                String highLow = highObject.getString("fahrenheit") + "/" + lowObject.getString("fahrenheit");
+                resultStrs[i] = monthDay + " - " + conditionsObject + " - " +  highLow;
+            }
+            for (String s : resultStrs) {
+                Log.v(LOG_TAG, "Forecast entry: " + s);
+            }
+
+
+                return resultStrs;
+        }
+
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -174,6 +206,13 @@ public class ForecastFragment extends Fragment {
                         Log.e("PlaceholderFragment", "Error closing stream", e);
                     }
                 }
+            }
+
+            try {
+                return getWeatherDataFromJson(forecastJsonStr);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
             }
             return null;
         }
