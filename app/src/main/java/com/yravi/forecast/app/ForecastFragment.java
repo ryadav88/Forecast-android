@@ -126,7 +126,7 @@ public class ForecastFragment extends Fragment {
                 resultStrs[i] = monthDay + " - " + conditionsObject + " - " +  highLow;
             }
             for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
+                Log.d(LOG_TAG, "Forecast entry: " + s);
             }
 
 
@@ -158,7 +158,7 @@ public class ForecastFragment extends Fragment {
 
                 URL url = new URL(builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+                Log.d(LOG_TAG, "Built URI " + builtUri.toString());
                 // URL url = new URL("http://api.wunderground.com/api/cf5d041ee0d9f003/forecast10day/q/CA/94538.json");
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -188,7 +188,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG,"Forecast JSON String: " + forecastJsonStr);
+                Log.d(LOG_TAG,"Forecast JSON String: " + forecastJsonStr);
 
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
@@ -216,5 +216,19 @@ public class ForecastFragment extends Fragment {
             }
             return null;
         }
+
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+                mForecastAdapter.clear();
+                for (String dayForecastStr : result) {
+                    mForecastAdapter.add(dayForecastStr);
+                }
+                // New data is back from the server.  Hooray!
+            }
+        }
+
+
     }
 }
