@@ -136,6 +136,8 @@ public class ForecastFragment extends Fragment {
                 JSONObject highObject = dayForecast.getJSONObject("high");
                 JSONObject lowObject = dayForecast.getJSONObject("low");
 
+
+
                 String monthDay = dateObject.getString("month") + "/" + dateObject.getString("day");
                 String highLow = highObject.getString("fahrenheit") + "/" + lowObject.getString("fahrenheit");
                 resultStrs[i] = monthDay + " - " + conditionsObject + " - " +  highLow;
